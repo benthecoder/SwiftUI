@@ -12,6 +12,7 @@ struct FlagView: View {
     
     var body: some View {
         Image(image)
+            .renderingMode(.original)
             .clipShape(.capsule)
             .shadow(radius: 5)
     }
@@ -26,6 +27,10 @@ struct ContentView: View {
     @State private var showingScore = false
     @State private var showFinalScore = false
     @State private var scoreTitle = ""
+    
+    // animation state vars
+    @State private var selectedFlag = -1 // -1 means no flag is selected
+    @State private var animationCompleted = false
 
     
     
@@ -54,10 +59,27 @@ struct ContentView: View {
                     }
                     
                     ForEach(0..<3) {number in
-                        Button {
-                            flagTapped(number)
-                        } label: {
-                            FlagView(image: countries[number])
+                        Button(action: {
+                            withAnimation {
+                                self.selectedFlag = number
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                withAnimation {
+                                    self.animationCompleted = true
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    self.flagTapped(number)
+                                }
+                            }
+                        }) {
+                            FlagView(image: self.countries[number])
+                                .rotation3DEffect(
+                                    .degrees(number == self.selectedFlag ? 360 : 0),
+                                                          axis: /*@START_MENU_TOKEN@*/(x: 0.0, y: 1.0, z: 0.0)/*@END_MENU_TOKEN@*/
+                                )
+                                .opacity(self.animationCompleted || self.selectedFlag == -1 || self.selectedFlag == number ? 1 : 0.25)
+                                .scaleEffect(self.animationCompleted || self.selectedFlag == -1 || self.selectedFlag == number ? 1 : 0.75)
+
                         }
                     }
                 }
@@ -110,6 +132,9 @@ struct ContentView: View {
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+        
+        selectedFlag = -1
+        animationCompleted = false
     }
     
     func resetGame() {
