@@ -92,17 +92,23 @@ struct ContentView: View {
             }
             .navigationTitle("iExpense")
             .toolbar {
-                Button {
-                    showingAddExpense = true
-                } label: {
+                NavigationLink(destination: AddView(expenses: expenses)) {
                     Label("Add Expense", systemImage: "plus")
                 }
             }
-            .sheet(isPresented: $showingAddExpense) {
-                VStack{
-                    AddView(expenses: expenses)
-                }.presentationDetents([.height(300)])
-            }
+//            .toolbar {
+//                Button {
+//                    showingAddExpense = true
+//                } label: {
+//                    Label("Add Expense", systemImage: "plus")
+//                }
+//            }
+//            .sheet(isPresented: $showingAddExpense) {
+//                VStack{
+//                    AddView(expenses: expenses)
+//                }.presentationDetents([.height(300)])
+//            }
+
         }
         .colorScheme(.dark)
     }

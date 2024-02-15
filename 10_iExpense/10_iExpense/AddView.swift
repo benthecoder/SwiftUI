@@ -12,18 +12,13 @@ struct AddView: View {
     
     var expenses: Expenses
     
-    @State private var name = ""
+    @State private var name = "Expense"
     @State private var type = "Personal"
     @State private var amount = 0.0
         
     var body: some View {
         NavigationStack{
-            Text("Add new expense")
-                .font(.headline)
-                .fontWeight(.bold)
             Form {
-                TextField("Name", text: $name)
-                
                 Picker("Type", selection: $type) {
                     Text("Personal").tag("Personal")
                     Text("Business").tag("Business")
@@ -31,15 +26,25 @@ struct AddView: View {
                 TextField("Amount", value: $amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                     .keyboardType(.decimalPad)
             }
+            .navigationTitle($name)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                Button("Save") {
-                    let item = ExpenseItem(name: name, type: type, amount: amount)
-                    expenses.items.append(item)
-                    dismiss()
+                ToolbarItem(placement:.cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        let item = ExpenseItem(name: name, type: type, amount: amount)
+                        expenses.items.append(item)
+                        dismiss()
+                    }
                 }
             }
-
         }
+        .navigationBarBackButtonHidden()
         .colorScheme(.dark)
     }
 }
